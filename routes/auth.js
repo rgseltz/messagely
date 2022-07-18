@@ -14,8 +14,10 @@ router.post('/login', async (req, res, next) => {
 		if (!username || !password) {
 			throw new ExpressError('Username and password required', 404);
 		}
-		const user = await User.authenticate(username, password);
-		return res.json(user);
+		let token = await User.authenticate(username, password);
+		const user = await User.get(username);
+		await User.updateLoginTimestamp(username);
+		return res.json(token);
 	} catch (err) {
 		return next(err);
 	}
